@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>MemoryGame - 01</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #e1feb9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: calc(5vh + 1vw);
+        }
+        .big-table {
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            aspect-ratio: 1 / 1.45;
+            border: 10pt outset orange;
+            background-color: #700227;
+            text-align: center;
+            font-family: Times;
+            font-weight: 800;
+            line-height: 1;
+            margin: 0 auto;
+            color: #000;
+            width: 100%;
+            max-width: 100vh;
+            height: auto;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-rows: 2fr 1fr 1fr 9fr;
+            box-sizing: border-box;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+        }
+        .grid-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            font-weight: bold;
+            color: #020754;
+            padding: 0rem;
+            box-sizing: border-box;
+            min-width: 0;
+            min-height: 0;
+        }
+        .score-container {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            width: 100%;
+            height: 100%;
+            margin: 1% 0 0 0;
+        }
+        .score-container-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 7%;
+        }
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            place-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 1%;
+            background-color: #458760;
+            margin: 2% 0 0 0;
+        }
+        .button-container .button {
+            flex: 1 1 auto;
+            height: 96%;
+            width: 75%;
+            margin: 2%;
+            border: 4px outset #020754;
+            border-radius: 10%;
+            box-shadow: 0 5px 10px #00000033;
+            outline: none;
+            font-family: Courier-New, sans-serif;
+            font-size: .3rem;
+            font-weight: 800;
+            line-height: 1;
+            color: black;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .intro-container, .question-table-container, .answer-table-container {
+            width: 85%;
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .question-table, .answer-table {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            place-items: center;
+        }
+        .question-table {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 5%;
+        }
+        .answer-table {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 3%;
+        }
+        .i-cell, .q-cell, .a-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            border-radius: 25%;
+            font-size: .55rem;
+            width: 100%;
+            height: 100%;
+        }
+        .i-cell, .q-cell {
+            border: 8px solid orange;
+        }
+        .a-cell {
+            border: 6px solid orange;
+            cursor: pointer;
+        }
+        .i-cell img, .q-cell img, .a-cell img {
+            width: 70%;
+            height: 70%;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .correct { background-color: #92e6a9 !important; }
+        .incorrect { background-color: #f69494 !important; }
+        .glowing-diamond {
+            filter: drop-shadow(0 0 5px #0ff) drop-shadow(0 0 10px #0ff) drop-shadow(0 0 15px #0ff);
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="big-table" id="bigTable">
+        <div class="grid-container">
+            <div class="grid-section game-title" style="color: lime;">
+                CHECK YOUR<br>MEMORY!
+            </div>
+            <div class="grid-section section-2 p-0">
+                <div class="score-container">
+                    <div class="score-container-item" id="score-item-1"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-2"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-3"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-4"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-5"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-6"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-7"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-8"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-9"><img src="Diamond.png"></div>
+                    <div class="score-container-item" id="score-item-10"><img src="Diamond.png"></div>
+                </div>
+            </div>
+            <div class="grid-section section-3 p-0">
+                <div class="button-container">
+                    <div class="button full-screen-button" id="fullScreenButton" style="background-color: #a9a6f9">FULL<br>SCREEN</div>
+                    <div class="button new-game-button" id="newGameButton" style="background-color: #b6f197">NEW<br>GAME</div>
+                    <div class="button game-over-button" id="gameOverButton" style="background-color: #f1a697">GAME<br>OVER</div>
+                </div>
+            </div>
+            <div class="grid-section section-4">
+                <div class="intro-container" id="intro-container">
+                    <div class="i-cell" id="i-cell"><img id="introImage" src="QuestionMark.png"></div>
+                </div>
+                <div class="question-table-container hidden" id="question-table-container">
+                    <div class="question-table">
+                        <div class="q-cell" id="cell-q1"></div>
+                        <div class="q-cell" id="cell-q2"></div>
+                        <div class="q-cell" id="cell-q3"></div>
+                        <div class="q-cell" id="cell-q4"></div>
+                    </div>
+                </div>
+                <div class="answer-table-container hidden" id="answer-table-container">
+                    <div class="answer-table">
+                        <div class="a-cell" data-index="0"></div>
+                        <div class="a-cell" data-index="1"></div>
+                        <div class="a-cell" data-index="2"></div>
+                        <div class="a-cell" data-index="3"></div>
+                        <div class="a-cell" data-index="4"></div>
+                        <div class="a-cell" data-index="5"></div>
+                        <div class="a-cell" data-index="6"></div>
+                        <div class="a-cell" data-index="7"></div>
+                        <div class="a-cell" data-index="8"></div>
+                        <div class="a-cell" data-index="9"></div>
+                        <div class="a-cell" data-index="10"></div>
+                        <div class="a-cell" data-index="11"></div>
+                        <div class="a-cell" data-index="12"></div>
+                        <div class="a-cell" data-index="13"></div>
+                        <div class="a-cell" data-index="14"></div>
+                        <div class="a-cell" data-index="15"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const gameTitle = document.querySelector('.game-title');
+  const introContainer = document.getElementById('intro-container');
+  const questionContainer = document.getElementById('question-table-container');
+  const answerContainer = document.getElementById('answer-table-container');
+  const newGameButton = document.getElementById('newGameButton');
+  const gameOverButton = document.getElementById('gameOverButton');
+  const fullScreenButton = document.getElementById('fullScreenButton');
+  const introImage = document.getElementById('introImage');
+
+  const qCells = Array.from(document.querySelectorAll('.q-cell'));
+  const aCells = Array.from(document.querySelectorAll('.a-cell'));
+  const diamonds = Array.from({ length: 10 }, (_, i) =>
+    document.querySelector(`#score-item-${i + 1} img`)
+  );
+
+  let rightImages = [];
+  let answerPool = [];
+  let playerChoices = new Set();
+  let timer = 0;
+  let timerId = null;
+  let phase = 'intro';
+  let winCount = 0;
+
+  // Intro slideshow
+  let introInterval = null;
+  let lastIntroIndex = -1;
+  const FADE_DURATION = 500;
+  const CHANGE_INTERVAL = 2000;
+
+  const gameData = [
+    { image: "Airplane.png" }, { image: "Anchor.png" }, { image: "Ball.png" },
+    { image: "Bike.png" }, { image: "Boat.png" }, { image: "Bucket.png" },
+    { image: "Cake.png" }, { image: "Clock.png" }, { image: "Cube.png" },
+    { image: "Dino.png" }, { image: "Duck.png" }, { image: "FlashLight.png" },
+    { image: "Horse.png" }, { image: "LadyBug.png" }, { image: "Pencil.png" },
+    { image: "Pyramid.png" }, { image: "Robot.png" }, { image: "Rocket.png" },
+    { image: "SchoolBus.png" }, { image: "Scooter.png" }, { image: "Shovel.png" },
+    { image: "Spinner.png" }, { image: "TeaCup.png" }, { image: "Train.png" },
+    { image: "Truck.png" }, { image: "TeaPot.png" }, { image: "Umbrella.png" }
+  ];
+
+  function createImageElement(name) {
+    const img = document.createElement('img');
+    img.src = name;
+    img.alt = name.replace('.png', '');
+    return img;
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function onlyShow(containerToShow) {
+    [introContainer, questionContainer, answerContainer].forEach(el => {
+      if (el === containerToShow) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    });
+  }
+
+  function setTitleSeconds(n) { gameTitle.textContent = `${n} seconds left`; }
+  function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+  function resetACells() { aCells.forEach(c => c.classList.remove('correct','incorrect')); }
+  function clearQCellBackgrounds() { qCells.forEach(c => c.style.backgroundColor = 'white'); }
+
+  function startIntroSlideshow() {
+    if (!introImage) return;
+    stopIntroSlideshow();
+    introImage.src = "QuestionMark.png";
+    introImage.style.opacity = 1;
+
+    introInterval = setInterval(() => {
+      introImage.style.opacity = 0;
+      setTimeout(() => {
+        let randomIndex;
+        do {
+          randomIndex = Math.floor(Math.random() * gameData.length);
+        } while (randomIndex === lastIntroIndex);
+        lastIntroIndex = randomIndex;
+        introImage.src = gameData[randomIndex].image;
+        void introImage.offsetWidth;
+        introImage.style.opacity = 1;
+      }, FADE_DURATION);
+    }, CHANGE_INTERVAL);
+  }
+
+  function stopIntroSlideshow() {
+    if (introInterval) {
+      clearInterval(introInterval);
+      introInterval = null;
+    }
+  }
+
+  function showIntro() {
+    stopTimer();
+    phase = 'intro';
+    onlyShow(introContainer);
+    gameTitle.innerHTML = 'CHECK YOUR<br>MEMORY!';
+    startIntroSlideshow();
+  }
+
+  function startQuestionMode() {
+    stopIntroSlideshow();
+    if (winCount >= 10) { diamonds.forEach(img => img.classList.remove('glowing-diamond')); winCount = 0; }
+    playerChoices.clear();
+    resetACells();
+    clearQCellBackgrounds();
+    answerPool = shuffle(gameData).slice(0,16);
+    aCells.forEach((cell, idx) => {
+      const { image } = answerPool[idx];
+      cell.innerHTML = '';
+      cell.appendChild(createImageElement(image));
+      cell.dataset.image = image;
+    });
+    rightImages = shuffle(answerPool).slice(0,4);
+    qCells.forEach((cell, idx) => {
+      cell.innerHTML = '';
+      cell.appendChild(createImageElement(rightImages[idx].image));
+      cell.style.backgroundColor = 'white';
+    });
+    phase = 'question';
+    onlyShow(questionContainer);
+    timer = 4;
+    setTitleSeconds(timer);
+    stopTimer();
+    timerId = setInterval(() => {
+      timer--;
+      if (timer >= 0) setTitleSeconds(timer);
+      if (timer <= 0) { stopTimer(); startAnswerMode(); }
+    }, 1000);
+  }
+
+  function startAnswerMode() {
+    phase = 'answer';
+    onlyShow(answerContainer);
+    timer = 12;
+    setTitleSeconds(timer);
+    stopTimer();
+    timerId = setInterval(() => {
+      timer--;
+      if (timer >= 0) setTitleSeconds(timer);
+      if (timer <= 0) { stopTimer(); startResultMode(); }
+    }, 1000);
+  }
+
+  function startResultMode() {
+    phase = 'result';
+    onlyShow(questionContainer);
+    qCells.forEach((cell, idx) => {
+      const img = rightImages[idx].image;
+      cell.style.backgroundColor = playerChoices.has(img) ? '#92e6a9' : '#f69494';
+    });
+    const allCorrect = rightImages.every(r => playerChoices.has(r.image)) && playerChoices.size === 4;
+    if (allCorrect) {
+      winCount++;
+      if (winCount >= 10) {
+        diamonds.forEach(img => img.classList.add('glowing-diamond'));
+        gameTitle.textContent = 'YOU ARE THE BEST!';
+      } else {
+        gameTitle.textContent = 'You WON!!!';
+        const slot = diamonds[winCount - 1];
+        if (slot) slot.classList.add('glowing-diamond');
+      }
+    } else {
+      gameTitle.textContent = 'You LOST!';
+    }
+  }
+
+  aCells.forEach(cell => {
+    cell.addEventListener('click', () => {
+      if (phase !== 'answer') return;
+      const img = cell.dataset.image;
+      if (!img || playerChoices.has(img) || playerChoices.size >= 4) return;
+      const isCorrect = rightImages.some(r => r.image === img);
+      playerChoices.add(img);
+      cell.classList.add(isCorrect ? 'correct':'incorrect');
+      if (playerChoices.size >= 4) { stopTimer(); startResultMode(); }
+    });
+  });
+
+  newGameButton.addEventListener('click', startQuestionMode);
+  gameOverButton.addEventListener('click', showIntro);
+  fullScreenButton.addEventListener('click', () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  });
+
+  function resizeBigTable() {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const portraitRatio = 1 / 1.45;
+    const bigTable = document.querySelector('.big-table');
+    if (vw / vh < portraitRatio) { bigTable.style.width = vw + 'px'; bigTable.style.height = (vw / portraitRatio) + 'px'; }
+    else { bigTable.style.height = vh + 'px'; bigTable.style.width = (vh * portraitRatio) + 'px'; }
+  }
+
+  window.addEventListener('resize', resizeBigTable);
+  window.addEventListener('DOMContentLoaded', () => { resizeBigTable(); showIntro(); });
+
+})();
+</script>
+</body>
+</html>
